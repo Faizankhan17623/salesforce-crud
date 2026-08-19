@@ -47,6 +47,13 @@ app.get('/auth/login', (req, res) => {
   res.redirect(`${process.env.SALESFORCE_LOGIN_URL}/services/oauth2/authorize?${params}`);
 });
 
+app.get('/',async (req,res)=>{
+    res.status(200).json({
+        message:"The server is up and running",
+        success:true
+    })
+})
+
 // Step 2: Salesforce sends code here → exchange for token
 app.get('/auth/callback', async (req, res) => {
   try {
