@@ -7,7 +7,7 @@ import { useToast } from './Toast';
 
 const PAGE_SIZE = 20;
 
-function Dashboard({ token, instance, darkMode, onToggleDarkMode }) {
+function Dashboard({ token, instance, darkMode, onToggleDarkMode, onLogout }) {
   const [objectType, setObjectType] = useState('Account');
   const [records, setRecords] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -192,6 +192,12 @@ function Dashboard({ token, instance, darkMode, onToggleDarkMode }) {
               className="text-blue-200 hover:text-white text-sm border border-blue-700 dark:border-slate-700 rounded-lg px-3 py-1.5 cursor-pointer whitespace-nowrap"
             >
               {darkMode ? '☀️ Light' : '🌙 Dark'}
+            </button>
+            <button
+              onClick={onLogout}
+              className="text-blue-200 hover:text-white text-sm border border-blue-700 dark:border-slate-700 rounded-lg px-3 py-1.5 cursor-pointer whitespace-nowrap"
+            >
+              Logout
             </button>
           </div>
         </div>

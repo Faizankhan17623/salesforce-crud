@@ -18,6 +18,12 @@ function App() {
 
   const toggleDarkMode = () => setDarkMode((d) => !d);
 
+  const handleLogout = () => {
+    setToken('');
+    setInstance('');
+    window.history.replaceState({}, '', window.location.pathname);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900">
       {token && instance ? (
@@ -26,6 +32,7 @@ function App() {
           instance={instance}
           darkMode={darkMode}
           onToggleDarkMode={toggleDarkMode}
+          onLogout={handleLogout}
         />
       ) : (
         <LoginPage darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
