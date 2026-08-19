@@ -41,14 +41,14 @@ function RecordModal({ objectType, record, onClose, onSubmit }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
             {isEdit ? `Edit ${objectType}` : `Create New ${objectType}`}
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 text-xl leading-none cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xl leading-none cursor-pointer"
           >
             &times;
           </button>
@@ -63,7 +63,7 @@ function RecordModal({ objectType, record, onClose, onSubmit }) {
 
           {fields.map((f) => (
             <div key={f.name}>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 {f.label} {f.required && <span className="text-red-500">*</span>}
               </label>
               {f.type === 'textarea' ? (
@@ -71,14 +71,14 @@ function RecordModal({ objectType, record, onClose, onSubmit }) {
                   value={formData[f.name]}
                   onChange={(e) => handleChange(f.name, e.target.value)}
                   rows={3}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-900"
                 />
               ) : (
                 <input
                   type={f.type}
                   value={formData[f.name]}
                   onChange={(e) => handleChange(f.name, e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-900"
+                  className="w-full border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-900"
                 />
               )}
             </div>
@@ -88,7 +88,7 @@ function RecordModal({ objectType, record, onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer"
             >
               Cancel
             </button>

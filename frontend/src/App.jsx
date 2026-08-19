@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import LoginPage from './LoginPage';
 import Dashboard from './Dashboard';
 
@@ -7,13 +7,28 @@ function App() {
 
   const [token, setToken] = useState(params.get('token') || '');
   const [instance, setInstance] = useState(params.get('instance') || '');
+  const [darkMode, setDarkMode] = useState(
+    () => localStorage.getItem('darkMode') === 'true'
+  );
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    localStorage.setItem('darkMode', darkMode);
+  }, [darkMode]);
+
+  const toggleDarkMode = () => setDarkMode((d) => !d);
 
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-900">
       {token && instance ? (
-        <Dashboard token={token} instance={instance} />
+        <Dashboard
+          token={token}
+          instance={instance}
+          darkMode={darkMode}
+          onToggleDarkMode={toggleDarkMode}
+        />
       ) : (
-        <LoginPage />
+        <LoginPage darkMode={darkMode} onToggleDarkMode={toggleDarkMode} />
       )}
     </div>
   );

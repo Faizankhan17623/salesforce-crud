@@ -60,17 +60,17 @@ function RecordTable({
 
   const renderSkeletonRows = (keyPrefix) =>
     Array.from({ length: skeletonRowCount }).map((_, rowIdx) => (
-      <tr key={`${keyPrefix}-${rowIdx}`} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+      <tr key={`${keyPrefix}-${rowIdx}`} className={rowIdx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/60'}>
         <td className="px-4 py-3">
-          <div className="h-4 w-4 bg-slate-200 rounded animate-pulse" />
+          <div className="h-4 w-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
         </td>
         {columns.map((col) => (
           <td key={col} className="px-4 py-3">
-            <div className="h-4 bg-slate-200 rounded animate-pulse" style={{ width: `${60 + ((rowIdx * 13) % 30)}%` }} />
+            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" style={{ width: `${60 + ((rowIdx * 13) % 30)}%` }} />
           </td>
         ))}
         <td className="px-4 py-3">
-          <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
+          <div className="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
         </td>
       </tr>
     ));
@@ -81,11 +81,11 @@ function RecordTable({
     <div
       ref={containerRef}
       onScroll={handleScroll}
-      className="border border-slate-200 rounded-lg overflow-auto bg-white shadow-sm"
+      className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-auto bg-white dark:bg-slate-800 shadow-sm"
       style={{ maxHeight: '65vh' }}
     >
       <table className="min-w-full text-sm">
-        <thead className="bg-blue-900 text-white sticky top-0">
+        <thead className="bg-blue-900 dark:bg-slate-950 text-white sticky top-0">
           <tr>
             <th className="px-4 py-3 w-10">
               <input
@@ -99,7 +99,7 @@ function RecordTable({
               <th
                 key={col}
                 onClick={() => handleSort(col)}
-                className="text-left px-4 py-3 font-semibold whitespace-nowrap cursor-pointer select-none hover:bg-blue-800"
+                className="text-left px-4 py-3 font-semibold whitespace-nowrap cursor-pointer select-none hover:bg-blue-800 dark:hover:bg-slate-800"
               >
                 {col}
                 {sortColumn === col && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
@@ -112,7 +112,7 @@ function RecordTable({
           {sortedRecords.map((record, idx) => (
             <tr
               key={record.Id}
-              className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}
+              className={idx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/60'}
             >
               <td className="px-4 py-2">
                 <input
@@ -123,7 +123,7 @@ function RecordTable({
                 />
               </td>
               {columns.map((col) => (
-                <td key={col} className="px-4 py-2 text-slate-700 whitespace-nowrap">
+                <td key={col} className="px-4 py-2 text-slate-700 dark:text-slate-200 whitespace-nowrap">
                   {record[col] ?? ''}
                 </td>
               ))}
@@ -146,7 +146,7 @@ function RecordTable({
           {loading && renderSkeletonRows('skeleton')}
           {records.length === 0 && !loading && (
             <tr>
-              <td colSpan={columns.length + 2} className="px-4 py-8 text-center text-slate-400">
+              <td colSpan={columns.length + 2} className="px-4 py-8 text-center text-slate-400 dark:text-slate-500">
                 No records found.
               </td>
             </tr>
@@ -154,7 +154,7 @@ function RecordTable({
         </tbody>
       </table>
       {!loading && records.length > 0 && (
-        <div className="text-center py-3 text-slate-400 text-xs">
+        <div className="text-center py-3 text-slate-400 dark:text-slate-500 text-xs">
           {hasMore
             ? `Showing ${records.length} records — scroll down to load more (20 per page)`
             : `Showing all ${records.length} records — no more to load`}

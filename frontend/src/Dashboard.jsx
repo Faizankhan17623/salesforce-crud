@@ -7,7 +7,7 @@ import { useToast } from './Toast';
 
 const PAGE_SIZE = 20;
 
-function Dashboard({ token, instance }) {
+function Dashboard({ token, instance, darkMode, onToggleDarkMode }) {
   const [objectType, setObjectType] = useState('Account');
   const [records, setRecords] = useState([]);
   const [offset, setOffset] = useState(0);
@@ -181,18 +181,26 @@ function Dashboard({ token, instance }) {
   };
 
   return (
-    <div className="min-h-screen">
-      <header className="bg-blue-900 text-white px-6 py-4 shadow-md">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen dark:bg-slate-900">
+      <header className="bg-blue-900 dark:bg-slate-950 text-white px-6 py-4 shadow-md">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
           <h1 className="text-xl font-bold">Salesforce CRUD</h1>
-          <span className="text-blue-200 text-sm truncate max-w-xs">{instance}</span>
+          <div className="flex items-center gap-4">
+            <span className="text-blue-200 text-sm truncate max-w-xs">{instance}</span>
+            <button
+              onClick={onToggleDarkMode}
+              className="text-blue-200 hover:text-white text-sm border border-blue-700 dark:border-slate-700 rounded-lg px-3 py-1.5 cursor-pointer whitespace-nowrap"
+            >
+              {darkMode ? '☀️ Light' : '🌙 Dark'}
+            </button>
+          </div>
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <label className="text-slate-700 font-medium">Object:</label>
+            <label className="text-slate-700 dark:text-slate-300 font-medium">Object:</label>
             <select
               value={objectType}
               onChange={(e) => {
@@ -200,7 +208,7 @@ function Dashboard({ token, instance }) {
                 setSearch('');
                 setSearchInput('');
               }}
-              className="border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 cursor-pointer"
+              className="border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-900 cursor-pointer"
             >
               {OBJECT_TYPES.map((type) => (
                 <option key={type} value={type}>
@@ -214,7 +222,7 @@ function Dashboard({ token, instance }) {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={`Search ${objectType}...`}
-              className="border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 w-56"
+              className="border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-900 w-56"
             />
           </div>
 
