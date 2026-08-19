@@ -5,6 +5,9 @@ standard objects — Account, Opportunity, Lead, Contact, and Case — through a
 using the native Salesforce interface. Authentication is handled via OAuth 2.0 (Authorization
 Code flow with PKCE) through a Salesforce External Client App.
 
+**Live app:** https://salesforce-crud.vercel.app
+**Repo:** https://github.com/Faizankhan17623/salesforce-crud
+
 ## Features
 
 - Login with Salesforce (OAuth 2.0 + PKCE)
@@ -12,6 +15,12 @@ Code flow with PKCE) through a Salesforce External Client App.
 - Dynamic field columns and forms per object
 - Infinite-scroll pagination — loads 20 records at a time, fetches more on scroll
 - Create, edit, and delete records directly from the UI
+- Search/filter records by name (or subject, for Case)
+- Click-to-sort table columns (ascending/descending)
+- Bulk select and bulk delete records
+- Toast notifications for create, update, delete, and bulk-delete outcomes
+- Animated skeleton loading state
+- Dark mode toggle (persisted across sessions)
 
 ## Tech Stack
 
@@ -94,10 +103,13 @@ Runs on `http://localhost:3000` by default (or whatever port Vite prints).
 
 ## Deployment
 
-- **Backend**: deployed as a Node web service (e.g. Render/Railway) with the environment
-  variables above configured on the host.
-- **Frontend**: deployed as a static Vite build (e.g. Vercel) with `VITE_API_BASE_URL` pointed
-  at the deployed backend.
-- Once both are deployed, update the External Client App's OAuth **Callback URL** to the
-  deployed backend's `/auth/callback` URL, and set `SALESFORCE_CALLBACK_URL` /
-  `FRONTEND_URL` on the backend host accordingly.
+- **Backend**: deployed as a Node web service on Render, with the environment variables above
+  configured on the host.
+- **Frontend**: deployed as a static Vite build on Vercel, with `VITE_API_BASE_URL` pointed at
+  the deployed backend.
+- The External Client App's OAuth **Callback URL** is set to the deployed backend's
+  `/auth/callback` URL, matching `SALESFORCE_CALLBACK_URL` on the backend host.
+  `FRONTEND_URL` on the backend host points at the deployed Vercel URL.
+
+Note: the free-tier backend may spin down after inactivity, so the first request after a period
+of idle time can take up to a minute to respond.
