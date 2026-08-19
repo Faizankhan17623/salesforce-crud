@@ -4,8 +4,10 @@ const axios = require('axios');
 const cors = require('cors');
 const crypto = require('crypto');
 
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
 const app = express();
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
 // Store token in memory (simple approach)
@@ -67,7 +69,7 @@ app.get('/auth/callback', async (req, res) => {
 
     // Redirect frontend with token info
     res.redirect(
-      `http://localhost:3000?token=${sfToken}&instance=${sfInstance}`
+      `${FRONTEND_URL}?token=${sfToken}&instance=${sfInstance}`
     );
   } catch (err) {
     console.error(err.response?.data || err.message);
