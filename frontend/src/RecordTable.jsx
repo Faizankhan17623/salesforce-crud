@@ -1,9 +1,33 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useState, useMemo } from 'react';
 import { OBJECT_COLUMNS } from './config';
 
 function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit, onDelete }) {
   const containerRef = useRef(null);
   const columns = OBJECT_COLUMNS[objectType];
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+
+  const handleSort = (col) => {
+    if (sortColumn === col) {
+      setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(col);
+      setSortDirection('asc');
+    }
+  };
+
+  const sortedRecords = useMemo(() => {
+    if (!sortColumn) return records;
+    const sorted = [...records].sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      if (typeof aVal === 'number' && typeof bVal === 'number') return aVal - bVal;
+      return String(aVal).localeCompare(String(bVal), undefined, { numeric: true });
+    });
+    return sortDirection === 'asc' ? sorted : sorted.reverse();
+  }, [records, sortColumn, sortDirection]);
 
   const handleScroll = useCallback(() => {
     const el = containerRef.current;
@@ -48,15 +72,20 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
         <thead className="bg-blue-900 text-white sticky top-0">
           <tr>
             {columns.map((col) => (
-              <th key={col} className="text-left px-4 py-3 font-semibold whitespace-nowrap">
+              <th
+                key={col}
+                onClick={() => handleSort(col)}
+                className="text-left px-4 py-3 font-semibold whitespace-nowrap cursor-pointer select-none hover:bg-blue-800"
+              >
                 {col}
+                {sortColumn === col && (sortDirection === 'asc' ? ' ▲' : ' ▼')}
               </th>
             ))}
             <th className="text-left px-4 py-3 font-semibold whitespace-nowrap">Actions</th>
           </tr>
         </thead>
         <tbody>
-          {records.map((record, idx) => (
+          {sortedRecords.map((record, idx) => (
             <tr
               key={record.Id}
               className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}
