@@ -19,6 +19,8 @@ function Dashboard({ token, instance }) {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
   const showToast = useToast();
 
   const fetchRecords = useCallback(
@@ -46,6 +48,7 @@ function Dashboard({ token, instance }) {
     setRecords([]);
     setOffset(0);
     setHasMore(true);
+    setSelectedIds(new Set());
     fetchRecords(0, false, search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objectType]);
@@ -56,6 +59,7 @@ function Dashboard({ token, instance }) {
       setRecords([]);
       setOffset(0);
       setHasMore(true);
+      setSelectedIds(new Set());
       fetchRecords(0, false, searchInput);
     }, 400);
     return () => clearTimeout(timer);
@@ -72,7 +76,51 @@ function Dashboard({ token, instance }) {
     setRecords([]);
     setOffset(0);
     setHasMore(true);
+    setSelectedIds(new Set());
     fetchRecords(0, false, search);
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = (visibleRecords, checked) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      visibleRecords.forEach((r) => (checked ? next.add(r.Id) : next.delete(r.Id)));
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!window.confirm(`Delete ${selectedIds.size} selected ${objectType} record(s)? This cannot be undone.`)) {
+      return;
+    }
+    setBulkDeleting(true);
+    const ids = Array.from(selectedIds);
+    let failures = 0;
+    for (const id of ids) {
+      try {
+        await axios.delete(`${API_BASE_URL}/api/records/${objectType}/${id}`, {
+          params: { token, instance },
+        });
+      } catch {
+        failures++;
+      }
+    }
+    setBulkDeleting(false);
+    if (failures === 0) {
+      showToast(`${ids.length} record(s) deleted successfully.`, 'success');
+    } else {
+      showToast(`${ids.length - failures} deleted, ${failures} failed.`, 'error');
+    }
+    refresh();
   };
 
   const openCreateModal = () => {
@@ -170,12 +218,23 @@ function Dashboard({ token, instance }) {
             />
           </div>
 
-          <button
-            onClick={openCreateModal}
-            className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-4 py-2 rounded-lg cursor-pointer"
-          >
-            + Create New
-          </button>
+          <div className="flex items-center gap-3">
+            {selectedIds.size > 0 && (
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkDeleting}
+                className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 py-2 rounded-lg disabled:opacity-50 cursor-pointer"
+              >
+                {bulkDeleting ? 'Deleting...' : `Delete Selected (${selectedIds.size})`}
+              </button>
+            )}
+            <button
+              onClick={openCreateModal}
+              className="bg-blue-900 hover:bg-blue-800 text-white font-medium px-4 py-2 rounded-lg cursor-pointer"
+            >
+              + Create New
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -192,6 +251,9 @@ function Dashboard({ token, instance }) {
           onLoadMore={handleLoadMore}
           onEdit={openEditModal}
           onDelete={handleDelete}
+          selectedIds={selectedIds}
+          onToggleSelect={toggleSelect}
+          onToggleSelectAll={toggleSelectAll}
         />
       </main>
 

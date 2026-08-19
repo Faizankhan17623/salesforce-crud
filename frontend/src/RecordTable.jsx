@@ -1,7 +1,18 @@
 import { useRef, useCallback, useState, useMemo } from 'react';
 import { OBJECT_COLUMNS } from './config';
 
-function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit, onDelete }) {
+function RecordTable({
+  objectType,
+  records,
+  loading,
+  hasMore,
+  onLoadMore,
+  onEdit,
+  onDelete,
+  selectedIds,
+  onToggleSelect,
+  onToggleSelectAll,
+}) {
   const containerRef = useRef(null);
   const columns = OBJECT_COLUMNS[objectType];
   const [sortColumn, setSortColumn] = useState(null);
@@ -50,6 +61,9 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
   const renderSkeletonRows = (keyPrefix) =>
     Array.from({ length: skeletonRowCount }).map((_, rowIdx) => (
       <tr key={`${keyPrefix}-${rowIdx}`} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+        <td className="px-4 py-3">
+          <div className="h-4 w-4 bg-slate-200 rounded animate-pulse" />
+        </td>
         {columns.map((col) => (
           <td key={col} className="px-4 py-3">
             <div className="h-4 bg-slate-200 rounded animate-pulse" style={{ width: `${60 + ((rowIdx * 13) % 30)}%` }} />
@@ -61,6 +75,8 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
       </tr>
     ));
 
+  const allSelected = records.length > 0 && records.every((r) => selectedIds.has(r.Id));
+
   return (
     <div
       ref={containerRef}
@@ -71,6 +87,14 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
       <table className="min-w-full text-sm">
         <thead className="bg-blue-900 text-white sticky top-0">
           <tr>
+            <th className="px-4 py-3 w-10">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={(e) => onToggleSelectAll(records, e.target.checked)}
+                className="cursor-pointer"
+              />
+            </th>
             {columns.map((col) => (
               <th
                 key={col}
@@ -90,6 +114,14 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
               key={record.Id}
               className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}
             >
+              <td className="px-4 py-2">
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(record.Id)}
+                  onChange={() => onToggleSelect(record.Id)}
+                  className="cursor-pointer"
+                />
+              </td>
               {columns.map((col) => (
                 <td key={col} className="px-4 py-2 text-slate-700 whitespace-nowrap">
                   {record[col] ?? ''}
@@ -114,7 +146,7 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
           {loading && renderSkeletonRows('skeleton')}
           {records.length === 0 && !loading && (
             <tr>
-              <td colSpan={columns.length + 1} className="px-4 py-8 text-center text-slate-400">
+              <td colSpan={columns.length + 2} className="px-4 py-8 text-center text-slate-400">
                 No records found.
               </td>
             </tr>
