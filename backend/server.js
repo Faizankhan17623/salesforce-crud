@@ -30,6 +30,19 @@ const objectFields = {
   Case:        'Id, Subject, Status, Priority, Description'
 };
 
+// The field searched against when a search term is provided
+const searchField = {
+  Account: 'Name',
+  Opportunity: 'Name',
+  Lead: 'Name',
+  Contact: 'Name',
+  Case: 'Subject',
+};
+
+function escapeSoql(value) {
+  return value.replace(/[\\']/g, '\\$&');
+}
+
 // ── AUTH ROUTES ──────────────────────────────────────
 
 // Step 1: Redirect user to Salesforce login
@@ -90,9 +103,12 @@ app.get('/auth/callback', async (req, res) => {
 app.get('/api/records/:object', async (req, res) => {
   try {
     const { object } = req.params;
-    const { token, instance, offset = 0 } = req.query;
+    const { token, instance, offset = 0, search = '' } = req.query;
     const fields = objectFields[object];
-    const query = `SELECT ${fields} FROM ${object} ORDER BY CreatedDate DESC LIMIT 20 OFFSET ${offset}`;
+    const whereClause = search.trim()
+      ? `WHERE ${searchField[object]} LIKE '%${escapeSoql(search.trim())}%'`
+      : '';
+    const query = `SELECT ${fields} FROM ${object} ${whereClause} ORDER BY CreatedDate DESC LIMIT 20 OFFSET ${offset}`;
 
     const response = await axios.get(
       `${instance}/services/data/v58.0/query?q=${encodeURIComponent(query)}`,

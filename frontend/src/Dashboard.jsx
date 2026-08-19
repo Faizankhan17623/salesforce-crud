@@ -13,17 +13,19 @@ function Dashboard({ token, instance }) {
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
   const fetchRecords = useCallback(
-    async (currentOffset, append) => {
+    async (currentOffset, append, searchTerm) => {
       setLoading(true);
       setError('');
       try {
         const res = await axios.get(`${API_BASE_URL}/api/records/${objectType}`, {
-          params: { token, instance, offset: currentOffset },
+          params: { token, instance, offset: currentOffset, search: searchTerm },
         });
         const newRecords = res.data;
         setRecords((prev) => (append ? [...prev, ...newRecords] : newRecords));
@@ -42,13 +44,25 @@ function Dashboard({ token, instance }) {
     setRecords([]);
     setOffset(0);
     setHasMore(true);
-    fetchRecords(0, false);
+    fetchRecords(0, false, search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [objectType]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setRecords([]);
+      setOffset(0);
+      setHasMore(true);
+      fetchRecords(0, false, searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
+
   const handleLoadMore = () => {
     if (!loading && hasMore) {
-      fetchRecords(offset, true);
+      fetchRecords(offset, true, search);
     }
   };
 
@@ -56,7 +70,7 @@ function Dashboard({ token, instance }) {
     setRecords([]);
     setOffset(0);
     setHasMore(true);
-    fetchRecords(0, false);
+    fetchRecords(0, false, search);
   };
 
   const openCreateModal = () => {
@@ -118,7 +132,11 @@ function Dashboard({ token, instance }) {
             <label className="text-slate-700 font-medium">Object:</label>
             <select
               value={objectType}
-              onChange={(e) => setObjectType(e.target.value)}
+              onChange={(e) => {
+                setObjectType(e.target.value);
+                setSearch('');
+                setSearchInput('');
+              }}
               className="border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 cursor-pointer"
             >
               {OBJECT_TYPES.map((type) => (
@@ -127,6 +145,14 @@ function Dashboard({ token, instance }) {
                 </option>
               ))}
             </select>
+
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={`Search ${objectType}...`}
+              className="border border-slate-300 rounded-lg px-3 py-2 bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-900 w-56"
+            />
           </div>
 
           <button
