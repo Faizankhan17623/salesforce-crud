@@ -76,10 +76,14 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
         </tbody>
       </table>
       {loading && (
-        <div className="text-center py-4 text-slate-500 text-sm">Loading...</div>
+        <div className="text-center py-4 text-slate-500 text-sm">Loading more records...</div>
       )}
-      {!hasMore && records.length > 0 && (
-        <div className="text-center py-3 text-slate-400 text-xs">No more records</div>
+      {!loading && records.length > 0 && (
+        <div className="text-center py-3 text-slate-400 text-xs">
+          {hasMore
+            ? `Showing ${records.length} records — scroll down to load more (20 per page)`
+            : `Showing all ${records.length} records — no more to load`}
+        </div>
       )}
     </div>
   );
