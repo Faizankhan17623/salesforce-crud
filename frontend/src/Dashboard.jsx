@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API_BASE_URL, OBJECT_TYPES } from './config';
 import RecordTable from './RecordTable';
 import RecordModal from './RecordModal';
+import { useToast } from './Toast';
 
 const PAGE_SIZE = 20;
 
@@ -18,6 +19,7 @@ function Dashboard({ token, instance }) {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const showToast = useToast();
 
   const fetchRecords = useCallback(
     async (currentOffset, append, searchTerm) => {
@@ -89,21 +91,31 @@ function Dashboard({ token, instance }) {
   };
 
   const handleModalSubmit = async (formData) => {
-    if (editingRecord) {
-      await axios.patch(`${API_BASE_URL}/api/records/${objectType}/${editingRecord.Id}`, {
-        token,
-        instance,
-        ...formData,
-      });
-    } else {
-      await axios.post(`${API_BASE_URL}/api/records/${objectType}`, {
-        token,
-        instance,
-        ...formData,
-      });
+    try {
+      if (editingRecord) {
+        await axios.patch(`${API_BASE_URL}/api/records/${objectType}/${editingRecord.Id}`, {
+          token,
+          instance,
+          ...formData,
+        });
+        showToast(`${objectType} updated successfully.`, 'success');
+      } else {
+        await axios.post(`${API_BASE_URL}/api/records/${objectType}`, {
+          token,
+          instance,
+          ...formData,
+        });
+        showToast(`${objectType} created successfully.`, 'success');
+      }
+      closeModal();
+      refresh();
+    } catch (err) {
+      showToast(
+        err.response?.data?.error?.message || err.message || 'Failed to save record.',
+        'error'
+      );
+      throw err;
     }
-    closeModal();
-    refresh();
   };
 
   const handleDelete = async (id) => {
@@ -111,9 +123,12 @@ function Dashboard({ token, instance }) {
       await axios.delete(`${API_BASE_URL}/api/records/${objectType}/${id}`, {
         params: { token, instance },
       });
+      showToast(`${objectType} deleted successfully.`, 'success');
       refresh();
     } catch (err) {
-      setError(err.response?.data?.error?.message || err.message || 'Failed to delete record.');
+      const message = err.response?.data?.error?.message || err.message || 'Failed to delete record.';
+      setError(message);
+      showToast(message, 'error');
     }
   };
 
