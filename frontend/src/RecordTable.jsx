@@ -21,6 +21,22 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
     }
   };
 
+  const skeletonRowCount = records.length === 0 ? 6 : 3;
+
+  const renderSkeletonRows = (keyPrefix) =>
+    Array.from({ length: skeletonRowCount }).map((_, rowIdx) => (
+      <tr key={`${keyPrefix}-${rowIdx}`} className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+        {columns.map((col) => (
+          <td key={col} className="px-4 py-3">
+            <div className="h-4 bg-slate-200 rounded animate-pulse" style={{ width: `${60 + ((rowIdx * 13) % 30)}%` }} />
+          </td>
+        ))}
+        <td className="px-4 py-3">
+          <div className="h-4 w-16 bg-slate-200 rounded animate-pulse" />
+        </td>
+      </tr>
+    ));
+
   return (
     <div
       ref={containerRef}
@@ -66,6 +82,7 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
               </td>
             </tr>
           ))}
+          {loading && renderSkeletonRows('skeleton')}
           {records.length === 0 && !loading && (
             <tr>
               <td colSpan={columns.length + 1} className="px-4 py-8 text-center text-slate-400">
@@ -75,9 +92,6 @@ function RecordTable({ objectType, records, loading, hasMore, onLoadMore, onEdit
           )}
         </tbody>
       </table>
-      {loading && (
-        <div className="text-center py-4 text-slate-500 text-sm">Loading more records...</div>
-      )}
       {!loading && records.length > 0 && (
         <div className="text-center py-3 text-slate-400 text-xs">
           {hasMore
